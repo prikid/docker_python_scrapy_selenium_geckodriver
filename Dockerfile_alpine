@@ -14,7 +14,9 @@ ENV PYTHONUNBUFFERED=1 \
     WEBDRIVER_PATH="/usr/local/bin/geckodriver" \
     FIREFOX_BIN="/usr/bin/firefox"
 COPY --from=geckodriver /geckodriver /usr/local/bin
-RUN apk add --update --no-cache --virtual .build-deps g++ gcc libxml2-dev libxslt-dev libffi-dev \
-    && apk add --no-cache libxslt \
+RUN --mount=type=cache,target=/root/.cache/pip \
+    apk add --update --no-cache --virtual .build-deps g++ gcc libxml2-dev libxslt libxslt-dev libffi-dev libpq-dev \
+    && apk add --no-cache libxslt libpq firefox-esr \
     && pip install --no-cache-dir Scrapy selenium scrapy-selenium itemloaders itemadapter  \
+    psycopg2 SQLAlchemy pandas rq redis python-dotenv python-dateutil \
     && apk del .build-deps
