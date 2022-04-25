@@ -1,0 +1,37 @@
+# docker build -t prikid/docker_python_scrapy_selenium_geckodriver:debian-aarch64 .
+FROM python:3.9
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN echo "Installing packages" \
+    && apt-get update \
+    && apt-get install --no-install-recommends -y libxtst6 libasound2 libgtk-3-0 libdbus-glib-1-2 libx11-xcb-dev libpci-dev \
+    gcc-aarch64-linux-gnu libc6-armhf-cross libc6-dev-armhf-cross firefox-esr \
+    \
+    && echo "===> Installing geckodriver..." \
+    && curl https://sh.rustup.rs -sSf | sh -s -- -y \
+    && . $HOME/.cargo/env \
+    && rustup target install aarch64-unknown-linux-gnu \
+    && GECKODRIVER_VERSION=`curl https://github.com/mozilla/geckodriver/releases/latest | grep -Po '[0-9]+.[0-9]+.[0-9]+'` \
+    && wget https://github.com/mozilla/geckodriver/archive/refs/tags/v$GECKODRIVER_VERSION.tar.gz -O geckodriver.tar.gz \
+    && tar -zxf geckodriver.tar.gz && rm geckodriver.tar.gz \
+    && cd geckodriver-$GECKODRIVER_VERSION \
+    && printf "[target.aarch64-unknown-linux-gnu]\nlinker = \"aarch64-linux-gnu-gcc\"" > .cargo/config \
+    && cargo build --release --target aarch64-unknown-linux-gnu \
+    && cp target/aarch64-unknown-linux-gnu/release/geckodriver /usr/local/bin \
+    && chmod +x /usr/local/bin/geckodriver \
+    && cd .. && rm -rf geckodriver-$GECKODRIVER_VERSION \
+    && rustup self uninstall -y \
+    \
+    && echo "===> Installing python dependencies..." \
+    && pip install Scrapy selenium scrapy-selenium itemloaders itemadapter \
+#    \
+#    && FIREFOX_SETUP=firefox-setup.tar.bz2 \
+#    && wget -O $FIREFOX_SETUP "https://download.mozilla.org/?product=firefox-latest&os=linux64" \
+#    && tar xjf $FIREFOX_SETUP -C /opt/ \
+#    && ln -s /opt/firefox/firefox /usr/bin/firefox \
+#    && rm $FIREFOX_SETUP \
+     && rm -rf /var/lib/apt/lists/*
+
+ENV PYTHONUNBUFFERED=1
+ENV WEBDRIVER_PATH="/usr/local/bin/geckodriver"
+ENV FIREFOX_BIN="/usr/bin/firefox"
