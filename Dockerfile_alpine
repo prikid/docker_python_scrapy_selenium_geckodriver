@@ -1,4 +1,4 @@
-# docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t prikid/docker_python_scrapy_selenium_geckodriver:alpine --push .
+# docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -f Dockerfile_alpine -t prikid/docker_python_scrapy_selenium_geckodriver:alpine --push .
 
 FROM --platform=$BUILDPLATFORM rust:alpine AS geckodriver
 RUN apk add curl build-base \
