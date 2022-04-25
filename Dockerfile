@@ -1,4 +1,4 @@
-# docker build -t prikid/docker_python_scrapy_selenium_geckodriver:alpine-aarch64 .
+# docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t prikid/docker_python_scrapy_selenium_geckodriver:alpine --push .
 
 FROM --platform=$BUILDPLATFORM rust:alpine AS geckodriver
 RUN apk add curl build-base \
@@ -6,7 +6,6 @@ RUN apk add curl build-base \
     && wget https://github.com/mozilla/geckodriver/archive/refs/tags/v$GECKODRIVER_VERSION.tar.gz -O geckodriver.tar.gz \
     && tar -zxf geckodriver.tar.gz \
     && cd geckodriver-$GECKODRIVER_VERSION \
-#    && rustup target add aarch64-unknown-linux-musl \
     && cargo build --release \
     && cp target/release/geckodriver /
 
