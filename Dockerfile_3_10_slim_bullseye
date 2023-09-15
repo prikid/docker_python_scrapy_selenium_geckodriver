@@ -16,7 +16,7 @@ FROM --platform=$BUILDPLATFORM bitnami/python:3.10
 ENV PYTHONUNBUFFERED=1 \
     WEBDRIVER_PATH="/usr/local/bin/geckodriver" \
     FIREFOX_BIN="/usr/bin/firefox"
-COPY --from=geckodriver /geckodriver /usr/local/bin
+COPY requirements.txt .
 RUN --mount=type=cache,target=/root/.cache/pip \
     buildDeps='gcc python-dev' \
     && set -x \
@@ -24,6 +24,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     && pip install --no-cache-dir -r requirements.txt \
     && apt-get purge -y --auto-remove $buildDeps \
     && rm -rf /var/lib/apt/lists/*
+
+COPY --from=geckodriver /geckodriver /usr/local/bin
 
 #    && pip install --no-cache-dir Scrapy selenium scrapy-selenium itemloaders itemadapter \
 #    psycopg2 SQLAlchemy pandas rq redis python-dotenv python-dateutil \
