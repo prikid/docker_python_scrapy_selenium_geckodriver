@@ -26,6 +26,3 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=geckodriver /geckodriver /usr/local/bin
-
-#    && pip install --no-cache-dir Scrapy selenium scrapy-selenium itemloaders itemadapter \
-#    psycopg2 SQLAlchemy pandas rq redis python-dotenv python-dateutil \
