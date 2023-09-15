@@ -21,7 +21,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     buildDeps='gcc python-dev' \
     && set -x \
     && apt-get update && apt-get install -y --no-install-recommends $buildDeps firefox-esr libpq-dev  \
-    && pip install --no-cache-dir Scrapy selenium scrapy-selenium itemloaders itemadapter \
-    psycopg2 SQLAlchemy pandas rq redis python-dotenv python-dateutil \
+#    && pip install --no-cache-dir Scrapy selenium scrapy-selenium itemloaders itemadapter \
+#    psycopg2 SQLAlchemy pandas rq redis python-dotenv python-dateutil \
+    && pip install --no-cache-dir -r requirements.txt \
     && apt-get purge -y --auto-remove $buildDeps \
     && rm -rf /var/lib/apt/lists/*
