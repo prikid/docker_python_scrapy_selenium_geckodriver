@@ -1,4 +1,4 @@
-# docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -f Dockerfile_3_10_alpine -t prikid/docker_python_scrapy_selenium_geckodriver:3.10-alpine --push .
+# use ./build.sh script to build and push images
 
 FROM --platform=$BUILDPLATFORM rust:alpine AS geckodriver
 RUN apk add curl build-base \
@@ -14,10 +14,13 @@ FROM --platform=$BUILDPLATFORM python:3.10-alpine
 ENV PYTHONUNBUFFERED=1 \
     WEBDRIVER_PATH="/usr/local/bin/geckodriver" \
     FIREFOX_BIN="/usr/bin/firefox"
-COPY --from=geckodriver /geckodriver /usr/local/bin
 COPY requirements.txt .
 RUN --mount=type=cache,target=/root/.cache/pip \
     apk add --update --no-cache --virtual .build-deps g++ gcc libxml2-dev libxslt libxslt-dev libffi-dev libpq-dev \
-    && apk add --no-cache libxslt libpq firefox-esr \
+    && apk add --no-cache libxslt libpq \
     && pip install --no-cache-dir -r requirements.txt \
     && apk del .build-deps
+
+RUN apk add --update --no-cache firefox-esr
+
+COPY --from=geckodriver /geckodriver /usr/local/bin
