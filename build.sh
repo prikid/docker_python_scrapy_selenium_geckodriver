@@ -2,6 +2,7 @@
 
 # Define the Dockerfile name
 dockerfile_name="Dockerfile_3_10_alpine"
+#dockerfile_name="Dockerfile_3_10_slim_bullseye"
 
 # Define the platform argument
 #platform_arg="--platform linux/amd64,linux/arm64,linux/arm/v7"
