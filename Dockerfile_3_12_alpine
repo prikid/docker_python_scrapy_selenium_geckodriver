@@ -1,0 +1,26 @@
+# use ./build.sh script to build and push images
+
+FROM --platform=$BUILDPLATFORM rust:alpine AS geckodriver
+RUN apk add curl build-base \
+#    && GECKODRIVER_VERSION=`curl https://github.com/mozilla/geckodriver/releases/latest | grep -oE '[0-9]+.[0-9]+.[0-9]+'` \
+    && GECKODRIVER_VERSION="0.33.0" \
+    && wget https://github.com/mozilla/geckodriver/archive/refs/tags/v$GECKODRIVER_VERSION.tar.gz -O geckodriver.tar.gz \
+    && tar -zxf geckodriver.tar.gz \
+    && cd geckodriver-$GECKODRIVER_VERSION \
+    && cargo build --release \
+    && cp target/release/geckodriver /
+
+FROM --platform=$BUILDPLATFORM python:3.12-alpine
+ENV PYTHONUNBUFFERED=1 \
+    WEBDRIVER_PATH="/usr/local/bin/geckodriver" \
+    FIREFOX_BIN="/usr/bin/firefox"
+COPY requirements.txt .
+RUN --mount=type=cache,target=/root/.cache/pip \
+    apk add --update --no-cache --virtual .build-deps g++ gcc libxml2-dev libxslt libxslt-dev libffi-dev libpq-dev \
+    && apk add --no-cache libxslt libpq \
+    && pip install --no-cache-dir -r requirements.txt \
+    && apk del .build-deps
+
+RUN apk add --update --no-cache firefox-esr
+
+COPY --from=geckodriver /geckodriver /usr/local/bin

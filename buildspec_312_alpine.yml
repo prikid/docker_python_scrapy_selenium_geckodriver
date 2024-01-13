@@ -1,0 +1,17 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Docker Hub...
+      - echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+      - echo Installing buildx...
+      - docker buildx create --use
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker buildx build -f Dockerfile_3_12_alpine --platform linux/amd64,linux/arm64 -t prikid/docker_python_scrapy_selenium_geckodriver:3.12-alpine --push .
+  post_build:
+    commands:
+      - echo Build completed on `date`
