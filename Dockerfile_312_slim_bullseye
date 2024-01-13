@@ -1,4 +1,4 @@
-# docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -f Dockerfile_3_12_slim_bullseye -t prikid/docker_python_scrapy_selenium_geckodriver:3.12-slim-bullseye --push .
+# docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -f Dockerfile_312_slim_bullseye -t prikid/docker_python_scrapy_selenium_geckodriver:3.12-slim-bullseye --push .
 
 FROM --platform=$BUILDPLATFORM rust:slim-bullseye AS geckodriver
 RUN apt-get update && apt-get install -y --no-install-recommends curl wget \

@@ -11,7 +11,7 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker buildx build -f Dockerfile_3_12_slim_bullseye --platform linux/amd64,linux/arm64 -t prikid/docker_python_scrapy_selenium_geckodriver:3.12-slim_bullseye --push .
+      - docker buildx build -f Dockerfile_312_slim_bullseye --platform linux/amd64,linux/arm64 -t prikid/docker_python_scrapy_selenium_geckodriver:3.12-slim_bullseye --push .
   post_build:
     commands:
       - echo Build completed on `date`
