@@ -1,0 +1,6 @@
+psycopg2==2.9.10
+pandas==2.3
+Scrapy==2.11.2
+selenium==4.15.1
+scrapy-selenium==0.0.7
+pyarrow==20.0.0

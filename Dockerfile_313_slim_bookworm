@@ -1,0 +1,27 @@
+# docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -f Dockerfile_313_slim_bookworm -t prikid/docker_python_scrapy_selenium_geckodriver:3.13-slim-bookworm --push .
+
+FROM --platform=$BUILDPLATFORM rust:slim-bookworm AS geckodriver
+RUN apt-get update && apt-get install -y --no-install-recommends curl wget \
+#    && GECKODRIVER_VERSION=`curl https://github.com/mozilla/geckodriver/releases/latest | grep -oE '[0-9]+.[0-9]+.[0-9]+'` \
+    && GECKODRIVER_VERSION="0.36.0" \
+    && wget https://github.com/mozilla/geckodriver/archive/refs/tags/v$GECKODRIVER_VERSION.tar.gz -O geckodriver.tar.gz \
+    && tar -zxf geckodriver.tar.gz \
+    && cd geckodriver-$GECKODRIVER_VERSION \
+    && cargo build --release \
+    && cp target/release/geckodriver / \
+    && rm -rf /var/lib/apt/lists/*
+
+FROM --platform=$BUILDPLATFORM bitnami/python:3.13-debian-12
+ENV PYTHONUNBUFFERED=1 \
+    WEBDRIVER_PATH="/usr/local/bin/geckodriver" \
+    FIREFOX_BIN="/usr/bin/firefox"
+COPY requirements_3.13.txt requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip \
+    buildDeps='gcc python-dev-is-python3' \
+    && set -x \
+    && apt-get update && apt-get install -y --no-install-recommends $buildDeps firefox-esr libpq-dev  \
+    && pip install --no-cache-dir -r requirements.txt \
+    && apt-get purge -y --auto-remove $buildDeps \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=geckodriver /geckodriver /usr/local/bin
